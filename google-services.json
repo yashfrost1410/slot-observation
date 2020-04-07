@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "525717537473",
+    "firebase_url": "https://fir-5157a.firebaseio.com",
+    "project_id": "fir-5157a",
+    "storage_bucket": "fir-5157a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:525717537473:android:2b16ff272115eb29628a40",
+        "android_client_info": {
+          "package_name": "com.charusat.SlotObservation"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "525717537473-mil0n3mr72i33luga9sukb9lbbr15r7q.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.charusat.SlotObservation",
+            "certificate_hash": "6bfcb58323935fbce58f7ee52a2c38779296693e"
+          }
+        },
+        {
+          "client_id": "525717537473-m2hl1p7l30aufh57b5n9ep2dukv34ofc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBvA4-bwqLNdDoNnH4ZAkrqIqXBLak9fAo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "525717537473-m2hl1p7l30aufh57b5n9ep2dukv34ofc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
