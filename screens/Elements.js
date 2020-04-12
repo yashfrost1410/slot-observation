@@ -1,13 +1,9 @@
 import React from "react";
-import { ScrollView, StyleSheet, Dimensions, View, TouchableOpacity } from "react-native";
+import { ScrollView, StyleSheet, Dimensions, View, TouchableOpacity, AsyncStorage } from "react-native";
 import { Dropdown } from 'react-native-material-dropdown';
 // Galio components
 import { Block, Text, Button, Input, theme } from "galio-framework";
-// Argon themed components
-//import { argonTheme, tabs } from "../constants/";
-//import { Button, Select, Icon, Input, Header, Switch } from "../components/";
-//import React, { Component } from 'react';
-//import Icon from 'react-native-vector-icons';
+
 import { Container, Header, Icon, Content, Card, Form, Label, Item, CardItem, Body, Picker, TextField, DatePicker } from 'native-base';
 import { FooterTabs } from '../components/footer';
 
@@ -18,15 +14,16 @@ class Elements extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      subject: 'CRNS',
-      strength: '50-60',
-      Afaculty: 'mishar',
-      Pfaculty: 'Dr. Parth Shah',
-      slot: '12:10-1:10',
-      classL: '708',
-      other: 'Issue',
+
+      classL: '',
+      Pfaculty: '',
+      strength: '',
+      other: '',
       chosenDate: new Date(),
       disabled: false,
+      slotDate: '',
+      token: "",
+      loading: true
     };
 
   }
@@ -37,11 +34,38 @@ class Elements extends React.Component {
       disabled: true
     });
   }
+  async componentDidMount() {
+    this.setState({ token: "Bearer " + await AsyncStorage.getItem('Token') });
+  }
+  submitHandler = async () => {
+
+    await fetch("https://slot-observation.herokuapp.com/", {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': this.state.token
+      },
+      body: JSON.stringify({
+        className: this.state.classL,
+        faculty: this.state.Pfaculty,
+        students: this.state.strength,
+        action: this.state.other
+      }
+      )
+    }).then((response) => response.json())
+      .then((res) => {
+
+        alert(res.message);
+
+      }).catch((err) => {
+        console.log('Error: ', err);
+      });
+  }
 
 
 
   render() {
-    let { subject, Pfaculty, slot, classL, chosenDate, strength, Afaculty, other, disabled } = this.state;
+    let { Pfaculty, slotDate, classL, chosenDate, strength, Afaculty, other, disabled } = this.state;
     return (
       <Container>
         <Content>
@@ -51,9 +75,9 @@ class Elements extends React.Component {
                 <View style={styles1.screen}>
                   <DatePicker
                     disabled={this.state.disabled}
-                    defaultDate={new Date(2018, 4, 4)}
-                    minimumDate={new Date(2018, 1, 1)}
-                    maximumDate={new Date(2018, 12, 31)}
+                    defaultDate={new Date(2020, 4, 4)}
+                    minimumDate={new Date(2020, 1, 1)}
+                    maximumDate={new Date(2020, 12, 31)}
                     locale={"en"}
                     timeZoneOffsetInMinutes={undefined}
                     modalTransparent={false}
@@ -72,8 +96,8 @@ class Elements extends React.Component {
                     <View style={{ flex: 1 }}>
                       <Dropdown
                         //ref={this.slotRef}
-                        value={slot}
-                        onChangeText={(data) => this.setState({ slot: data })}
+                        value={slotDate}
+                        onChangeText={(data) => this.setState({ slotDate: data })}
                         label='slot'
                         data={SlotData}
                       />
@@ -93,7 +117,7 @@ class Elements extends React.Component {
                     </View>
                   </View>
                   <Input
-                    placeholder={this.state.Afaculty}
+                    placeholder="yash"
                     right
                     disabled
                     icon="person"
@@ -112,15 +136,6 @@ class Elements extends React.Component {
                   />
 
 
-                  <Input
-                    placeholder="Subject:"
-                    right
-                    icon="collections-bookmark"
-                    family="MaterialIcons"
-                    iconSize={14}
-                    iconColor="black"
-                    onChangeText={(data) => this.setState({ subject: data })}
-                  />
 
                   <Dropdown
                     value={this.state.strength}
@@ -146,14 +161,7 @@ class Elements extends React.Component {
             </CardItem>
             <CardItem footer>
               <Button block
-                onPress={() => this.props.navigation.navigate('Home', {
-                  slot: this.state.slot,
-                  classL: this.state.classL,
-                  Pfaculty: this.state.Pfaculty,
-                  subject: this.state.subject,
-                  strength: this.state.strength,
-                  other: this.state.other,
-                })}>
+                onPress={this.submitHandler}>
                 <Text style={{ color: "white" }}>Send</Text>
               </Button>
             </CardItem>
@@ -185,16 +193,16 @@ const SlotData = [
 ];
 
 const strengthData = [
-  { value: '00-10' },
-  { value: '10-20' },
-  { value: '20-30' },
-  { value: '30-40' },
-  { value: '40-50' },
-  { value: '50-60' },
-  { value: '60-70' },
-  { value: '70-80' },
-  { value: '80-90' },
-  { value: '90-100' },
+  { value: '10' },
+  { value: '20' },
+  { value: '30' },
+  { value: '40' },
+  { value: '50' },
+  { value: '60' },
+  { value: '70' },
+  { value: '80' },
+  { value: '90' },
+  { value: '100' },
 ];
 
 

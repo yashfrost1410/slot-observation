@@ -1,74 +1,44 @@
 import React from 'react';
-import { Image } from 'react-native';
+import { Image, View } from 'react-native';
 import { AppLoading } from 'expo';
 import { Asset } from 'expo-asset';
 import { Block, GalioProvider } from 'galio-framework';
-
+import * as Font from 'expo-font';
 import Screens from './navigation/Screens';
 import { Images, argonTheme } from './constants';
 
-// cache app images
-const assetImages = [
-  Images.Onboarding,
-  Images.LogoOnboarding,
-  Images.Logo,
-  Images.Pro,
-  Images.ArgonLogo,
-  Images.iOSLogo,
-  Images.androidLogo
-];
+import { Ionicons } from '@expo/vector-icons';
 
-// cache product images
-
-function cacheImages(images) {
-  return images.map(image => {
-    if (typeof image === 'string') {
-      return Image.prefetch(image);
-    } else {
-      return Asset.fromModule(image).downloadAsync();
-    }
-  });
-}
 
 export default class App extends React.Component {
   state = {
-    isLoadingComplete: false,
+    loading: true
+  }
+  async componentDidMount() {
+    await Font.loadAsync({
+      'Roboto': require('native-base/Fonts/Roboto.ttf'),
+      'Roboto_medium': require('native-base/Fonts/Roboto_medium.ttf'),
+      ...Ionicons.font,
+    })
+    this.setState({ loading: false })
   }
 
   render() {
-    if (!this.state.isLoadingComplete) {
+    if (this.state.loading) {
       return (
-        <AppLoading
-          startAsync={this._loadResourcesAsync}
-          onError={this._handleLoadingError}
-          onFinish={this._handleFinishLoading}
-        />
-      );
-    } else {
-      return (
-        <GalioProvider theme={argonTheme}>
-          <Block flex>
-            <Screens />
-          </Block>
-        </GalioProvider>
+        <View></View>
       );
     }
+
+    return (
+      <GalioProvider theme={argonTheme}>
+        <Block flex>
+          <Screens />
+        </Block>
+      </GalioProvider>
+    );
   }
 
-  _loadResourcesAsync = async () => {
-    return Promise.all([
-      ...cacheImages(assetImages),
-    ]);
-  };
 
-  _handleLoadingError = error => {
-    // In this case, you might want to report the error to your error
-    // reporting service, for example Sentry
-    console.warn(error);
-  };
-
-  _handleFinishLoading = () => {
-    this.setState({ isLoadingComplete: true });
-  };
 
 }

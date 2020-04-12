@@ -5,17 +5,16 @@ import {
   Dimensions,
   StatusBar,
   KeyboardAvoidingView,
-  ScrollView,
-  AsyncStorage
+  ScrollView
+  , AsyncStorage
 } from "react-native";
 import { Block, Checkbox, Text, theme } from "galio-framework";
 import { StackNavigator } from "react-navigation";
 import { Button, Icon, Input } from "../components";
 import { Images, argonTheme } from "../constants";
-import { axios } from "axios";
 const { width, height } = Dimensions.get("screen");
 
-class Register extends React.Component {
+class Onboarding extends React.Component {
   state = {
     email: "",
     password: "",
@@ -24,50 +23,42 @@ class Register extends React.Component {
     loading: true,
   };
   async componentDidMount() {
-    var value = await AsyncStorage.getItem('Token');
-    if (value !== null) {
-      this.props.navigation.navigate('Home')
+    try {
+      await AsyncStorage.removeItem('Token');
+
+    }
+    catch (exception) {
+
     }
   }
   submitHandler = async () => {
-    const values = {
-      email: this.state.email,
-      password: this.state.password
-    };
-    await fetch("http://192.168.232.2:3000/user/login", {
-      method: 'POST', // *GET, POST, PUT, DELETE, etc.
+    await fetch("https://slot-observation.herokuapp.com/user/login", {
+      method: 'POST',
       headers: {
         'Content-Type': 'application/json'
-
-        // 'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: JSON.stringify({
         email: this.state.email,
-        password: this.state.password
-      }, getCircularReplacer = () => {
-        const seen = new WeakSet();
-        return (key, value) => {
-          if (typeof value === "object" && value !== null) {
-            if (seen.has(value)) {
-              return;
-            }
-            seen.add(value);
-          }
-          return value;
-        };
-      }) // body data type must match "Content-Type" header
-    }).then((respone) => respone.json())
+        password: this.state.password,
+      }
+      )
+    }).then((response) => response.json())
       .then((res) => {
-        if (res.success == true) {
-          AsyncStorage.setItem('Token', res.data.token)
-          alert(res.data.token)
+        try {
+          if (res.token !== null) {
+            AsyncStorage.setItem('Token', res.token);
+            alert(res.token);
+            this.props.navigation.navigate('Home');
+          }
         }
-        else {
-          alert(res.message);
+        catch (e) {
+          alert(e);
         }
-      }).done();
-
+      }).catch((err) => {
+        console.log('Error: ', err);
+      });
   }
+
 
   render() {
     const { email, password, loading, redirect } = this.state;
@@ -79,114 +70,115 @@ class Register extends React.Component {
           style={{ width, height, zIndex: 1 }}
         >
           <Block flex middle>
-            <Block style={styles.registerContainer}>
-              <Block flex>
-                <Block flex={0.17} middle>
-                  <Text color="#8898AA" size={20}>
-                    Sign In
+            <KeyboardAvoidingView behavior='padding'>
+              <Block style={styles.registerContainer}>
+                <Block flex>
+                  <Block flex={0.17} middle>
+                    <Text color="#8898AA" size={20}>
+                      Sign In
                     </Text>
-                </Block>
-                <Block flex center>
-                  <KeyboardAvoidingView
-                    style={{ flex: 1 }}
-                    behavior="padding"
-                    enabled
-                  >
-                    <Block width={width * 0.8} style={{ marginBottom: 15 }}>
-                      <Input
-                        borderless
-                        placeholder="Email Default:yash@gmail.com"
-                        onChangeText={(email) => this.setState({ email })}
-                        iconContent={
-                          <Icon
-                            size={16}
-                            color={argonTheme.COLORS.ICON}
-                            name="ic_mail_24px"
-                            family="ArgonExtra"
-                            style={styles.inputIcons}
-                          />
-                        }
-                      />
-                    </Block>
-                    <Block width={width * 0.8}>
-                      <Input
-                        borderless
-                        placeholder="Password Default:12345"
-                        onChange={(password) => this.setState({ password })}
-                        secureTextEntry={true}
-                        iconContent={
-                          <Icon
-                            size={16}
-                            col or={argonTheme.COLORS.ICON}
-                            name="padlock-unlocked"
-                            family="ArgonExtra"
-                            style={styles.inputIcons}
-                          />
-                        }
-                      />
-                    </Block>
-                    <Block row width={width * 0.75}>
-                      <Checkbox
-                        checkboxStyle={{
-                          borderWidth: 3
-                        }}
-                        color={argonTheme.COLORS.PRIMARY}
-                        label="I agree with the"
-                      />
-                      <Button
-                        style={{ width: 100 }}
-                        color="transparent"
-                        textStyle={{
-                          color: argonTheme.COLORS.PRIMARY,
-                          fontSize: 14
-                        }}
-                      >
-                        Privacy Policy
+                  </Block>
+                  <Block flex center>
+                    <KeyboardAvoidingView
+                      style={{ flex: 1 }}
+                      behavior="padding"
+                      enabled
+                    >
+                      <Block width={width * 0.8} style={{ marginBottom: 15 }}>
+                        <Input
+                          borderless
+                          placeholder="Email Default:yash@gmail.com"
+                          onChangeText={(data) => this.setState({ email: data })}
+                          iconContent={
+                            <Icon
+                              size={16}
+                              color={argonTheme.COLORS.ICON}
+                              name="ic_mail_24px"
+                              family="ArgonExtra"
+                              style={styles.inputIcons}
+                            />
+                          }
+                        />
+                      </Block>
+                      <Block width={width * 0.8}>
+                        <Input
+                          borderless
+                          placeholder="Password Default:12345"
+                          onChangeText={(data) => this.setState({ password: data })}
+                          secureTextEntry={true}
+                          iconContent={
+                            <Icon
+                              size={16}
+                              col or={argonTheme.COLORS.ICON}
+                              name="padlock-unlocked"
+                              family="ArgonExtra"
+                              style={styles.inputIcons}
+                            />
+                          }
+                        />
+                      </Block>
+                      <Block row width={width * 0.75}>
+                        <Checkbox
+                          checkboxStyle={{
+                            borderWidth: 3
+                          }}
+                          color={argonTheme.COLORS.PRIMARY}
+                          label="I agree with the"
+                        />
+                        <Button
+                          style={{ width: 100 }}
+                          color="transparent"
+                          textStyle={{
+                            color: argonTheme.COLORS.PRIMARY,
+                            fontSize: 14
+                          }}
+                        >
+                          Privacy Policy
                       </Button>
-                    </Block>
-                    <Block middle>
-                      <Button color="primary" onPress={this.submitHandler} style={styles.createButton}>
-                        <Text bold size={14} color={argonTheme.COLORS.WHITE}>
-                          SIGN IN
+                      </Block>
+                      <Block middle>
+                        <Button color="primary" onPress={this.submitHandler} style={styles.createButton}>
+                          <Text bold size={14} color={argonTheme.COLORS.WHITE}>
+                            SIGN IN
                         </Text>
-                      </Button>
-                    </Block>
-                  </KeyboardAvoidingView>
+                        </Button>
+                      </Block>
+                    </KeyboardAvoidingView>
+                  </Block>
                 </Block>
-              </Block>
-              <Block flex={0.25} middle style={styles.socialConnect}>
-                <Text color="#8898AA" size={12}>
-                  Sign up with (under development)
+                <Block flex={0.25} middle style={styles.socialConnect}>
+                  <Text color="#8898AA" size={12}>
+                    Sign up with (under development)
                 </Text>
-                <Block row style={{ marginTop: theme.SIZES.BASE }}>
-                  <Button style={{ ...styles.socialButtons, marginRight: 30 }}>
-                    <Block row>
-                      <Icon
-                        name="logo-github"
-                        family="Ionicon"
-                        size={14}
-                        color={"black"}
-                        style={{ marginTop: 2, marginRight: 5 }}
-                      />
-                      <Text style={styles.socialTextButtons}>GITHUB</Text>
-                    </Block>
-                  </Button>
-                  <Button style={styles.socialButtons}>
-                    <Block row>
-                      <Icon
-                        name="logo-google"
-                        family="Ionicon"
-                        size={14}
-                        color={"black"}
-                        style={{ marginTop: 2, marginRight: 5 }}
-                      />
-                      <Text style={styles.socialTextButtons}>GOOGLE</Text>
-                    </Block>
-                  </Button>
+                  <Block row style={{ marginTop: theme.SIZES.BASE }}>
+                    <Button style={{ ...styles.socialButtons, marginRight: 30 }}>
+                      <Block row>
+                        <Icon
+                          name="logo-github"
+                          family="Ionicon"
+                          size={14}
+                          color={"black"}
+                          style={{ marginTop: 2, marginRight: 5 }}
+                        />
+                        <Text style={styles.socialTextButtons}>GITHUB</Text>
+                      </Block>
+                    </Button>
+                    <Button style={styles.socialButtons}>
+                      <Block row>
+                        <Icon
+                          name="logo-google"
+                          family="Ionicon"
+                          size={14}
+                          color={"black"}
+                          style={{ marginTop: 2, marginRight: 5 }}
+                        />
+                        <Text style={styles.socialTextButtons}>GOOGLE</Text>
+                      </Block>
+                    </Button>
+                  </Block>
                 </Block>
               </Block>
-
-            </Block>
+            </KeyboardAvoidingView>
           </Block>
         </ImageBackground>
       </Block>
@@ -247,4 +239,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default Register;
+export default Onboarding;
